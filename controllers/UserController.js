@@ -4,15 +4,20 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const createUserToken = require("../helpers/create-user-token");
 const getToken = require("../helpers/get-token");
+const getUserFromToken = require("../helpers/get-user-from-token");
 
 module.exports = class UserController {
-  static async getAllUsers(req, res) {
+  static async checkUser(req, res) {
     try {
-      const users = await User.find({}, "-password"); // Exclui a senha dos resultados
-      res.status(200).json(users);
+      const user = await getUserFromToken(req);
+      res.status(200).json({
+        _id: user._id,
+        name: user.name,
+        registration: user.registration,
+        role: user.role,
+      });
     } catch (error) {
-      console.error("Erro ao buscar usuários:", error);
-      res.status(500).json({ message: "Erro interno do servidor." });
+      res.status(401).json({ message: error.message });
     }
   }
 
@@ -31,7 +36,17 @@ module.exports = class UserController {
     res.status(200).json({ user });
   }
 
-  static async register(req, res) {
+  static async getAll(req, res) {
+    try {
+      const users = await User.find({}, "-password -__v"); // Exclui a senha dos resultados
+      res.status(200).json(users);
+    } catch (error) {
+      console.error("Erro ao buscar usuários:", error);
+      res.status(500).json({ message: "Erro interno do servidor." });
+    }
+  }
+
+  static async create(req, res) {
     try {
       const { name, registration, role } = req.body;
 
@@ -53,11 +68,9 @@ module.exports = class UserController {
         registration
       );
       if (registrationChecked) {
-        return res
-          .status(409)
-          .json({
-            message: `Matrícula ${registration} já utilizada pelo usuário ${registrationChecked}.`,
-          });
+        return res.status(409).json({
+          message: `Matrícula ${registration} já utilizada pelo usuário ${registrationChecked}.`,
+        });
       }
 
       // Criando senha padrão (nome + matrícula)
@@ -77,49 +90,17 @@ module.exports = class UserController {
 
       await newUser.save();
 
+      // Convertendo para objeto e removendo campos sensíveis
+      const userResponse = newUser.toObject();
+      delete userResponse.password;
+      delete userResponse.__v;
+
       res.status(201).json({
         message: "Usuário cadastrado com sucesso!",
-        user: newUser,
+        user: userResponse,
       });
     } catch (error) {
       console.error("Erro ao registrar usuário:", error);
-      res.status(500).json({ message: "Erro interno do servidor." });
-    }
-  }
-
-  static async updatePassword(req, res) {
-    try {
-      const { registration, newPassword, confirmPassword } = req.body;
-
-      // Verificando se todos os campos foram informados
-      if (!registration || !newPassword || !confirmPassword) {
-        return res
-          .status(422)
-          .json({ message: "Todos os campos são obrigatórios." });
-      }
-
-      // Conferindo se as senhas coincidem
-      if (newPassword !== confirmPassword) {
-        return res.status(400).json({ message: "As senhas não coincidem." });
-      }
-
-      // Verificando se o usuário existe
-      const user = await User.findOne({ registration });
-      if (!user) {
-        return res.status(404).json({ message: "Usuário não encontrado." });
-      }
-
-      // Gerando hash da nova senha
-      const salt = await bcrypt.genSalt(12);
-      const newPasswordHash = await bcrypt.hash(newPassword, salt);
-
-      // Atualizando senha do usuário
-      user.password = newPasswordHash;
-      await user.save();
-
-      res.status(200).json({ message: "Senha atualizada com sucesso!" });
-    } catch (error) {
-      console.error("Erro ao atualizar senha:", error);
       res.status(500).json({ message: "Erro interno do servidor." });
     }
   }
@@ -153,33 +134,47 @@ module.exports = class UserController {
     createUserToken(user, req, res);
   }
 
-  static async checkUser(req, res) {
-    let currentUser = null;
+  static async updatePassword(req, res) {
+    try {
+      const { newPassword, confirmPassword } = req.body;
 
-    if (req.headers.authorization) {
-      try {
-        const token = getToken(req);
-        const userDecoded = jwt.verify(token, process.env.TOKEN_KEY);
-
-        currentUser = await User.findById(userDecoded.id).select(
-          "-password -__v"
-        );
-      } catch (error) {
-        return res.status(401).json({ message: "Token inválido ou expirado." });
+      if (!newPassword || !confirmPassword) {
+        return res
+          .status(422)
+          .json({ message: "Todos os campos são obrigatórios." });
       }
-    }
 
-    res.status(200).json(currentUser);
+      if (newPassword !== confirmPassword) {
+        return res.status(400).json({ message: "As senhas não coincidem." });
+      }
+
+      const user = await getUserFromToken(req);
+
+      const salt = await bcrypt.genSalt(12);
+      user.password = await bcrypt.hash(newPassword, salt);
+      await user.save();
+
+      res.status(200).json({ message: "Senha atualizada com sucesso!" });
+    } catch (error) {
+      console.error("Erro ao atualizar senha:", error);
+      res.status(500).json({ message: "Erro interno do servidor." });
+    }
   }
 
-  static async editUser(req, res) {
+  static async update(req, res) {
     try {
       const { id } = req.params;
-      const { name, registration, role } = req.body;
 
       if (!id.match(/^[0-9a-fA-F]{24}$/)) {
         return res.status(400).json({ message: "ID inválido." });
       }
+
+      const user = await User.findById(id);
+      if (!user) {
+        return res.status(404).json({ message: "Usuário não encontrado." });
+      }
+
+      const { name, registration, role } = req.body;
 
       if (!name || !registration || !role) {
         return res
@@ -187,22 +182,39 @@ module.exports = class UserController {
           .json({ message: "Todos os campos são obrigatórios." });
       }
 
-      const updatedUser = await User.findByIdAndUpdate(
-        id,
-        { name, registration, role },
-        { new: true, runValidators: true }
-      ).select("-password -__v");
+      user.name = name;
+      user.registration = registration;
+      user.role = role;
 
-      if (!updatedUser) {
-        return res.status(404).json({ message: "Usuário não encontrado." });
-      }
+      await user.save();
+
+      const updatedUser = await User.findById(user._id).select(
+        "-password -__v"
+      );
 
       res.status(200).json({
         message: "Usuário atualizado com sucesso!",
         user: updatedUser,
       });
     } catch (error) {
-      console.error("Erro ao atualizar usuário:", error);
+      console.error("Erro ao editar usuário:", error);
+      res.status(500).json({ message: "Erro interno do servidor." });
+    }
+  }
+
+  static async delete(req, res) {
+    try {
+      const { id } = req.params;
+
+      const user = await User.findById(id);
+      if (!user) {
+        return res.status(404).json({ message: "Usuário não encontrado." });
+      }
+
+      await User.findByIdAndDelete(id);
+      res.status(200).json({ message: "Usuário deletado com sucesso." });
+    } catch (error) {
+      console.error("Erro ao deletar usuário:", error);
       res.status(500).json({ message: "Erro interno do servidor." });
     }
   }

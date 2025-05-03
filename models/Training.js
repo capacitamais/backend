@@ -10,7 +10,19 @@ const Training = mongoose.model(
         required: true,
         unique: true,
       },
+      revision:{
+        type: Number,
+        required: true,
+      },
+      title: {
+        type: String,
+        required: true,
+      },
       description: String,
+      isActive: {
+        type: Boolean,
+        default: true,
+      }
     },
     { timestamps: true }
   )

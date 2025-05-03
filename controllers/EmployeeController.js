@@ -1,5 +1,5 @@
 const Employee = require("../models/Employee");
-const TrainingReceived = require("../models/TrainingReceived");
+const TrainingReceived = require("../models/ReceivedTraining");
 
 module.exports = class EmployeeController {
   static async create(req, res) {
@@ -58,7 +58,7 @@ module.exports = class EmployeeController {
     }
   }
 
-  static async remove(req, res) {
+  static async delete(req, res) {
     try {
       const { id } = req.params;
       const deleted = await Employee.findByIdAndDelete(id);
@@ -84,7 +84,7 @@ module.exports = class EmployeeController {
       res.status(200).json(employee);
     } catch (err) {
       res.status(500).json({
-        error: "Erro ao buscar funcionário por matrícula",
+        error: "Erro ao buscar colaborador por matrícula",
         details: err.message,
       });
     }

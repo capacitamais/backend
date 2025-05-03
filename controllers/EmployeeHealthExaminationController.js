@@ -16,7 +16,7 @@ module.exports = class EmployeeHealthExaminationController {
     } catch (err) {
       res
         .status(500)
-        .json({ error: "Erro ao registrar exame", details: err.message });
+        .json({ error: "Erro ao vincular exame ao colaborador.", details: err.message });
     }
   }
 };

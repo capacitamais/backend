@@ -14,7 +14,7 @@ module.exports = class ActivityRequiredTrainingController {
     } catch (err) {
       res
         .status(500)
-        .json({ error: "Erro ao registrar treinamento", details: err.message });
+        .json({ error: "Erro ao vincular treinamento e atividade.", details: err.message });
     }
   }
 };

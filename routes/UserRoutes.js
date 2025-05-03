@@ -5,11 +5,13 @@ const UserController = require('../controllers/UserController')
 const checkAuth = require('../helpers/check-auth')
 const checkRole = require('../helpers/check-role')
 
-router.get('/', UserController.getAllUsers)
-router.get('/:id', UserController.getById)
 router.get('/check-user', UserController.checkUser)
-router.post('/register', checkAuth, checkRole('analyst'), UserController.register)
+router.get('/:id', checkAuth, checkRole('analyst'), UserController.getById)
+router.get('/', checkAuth, checkRole('analyst'), UserController.getAll)
+router.post('/create', checkAuth, checkRole('analyst'), UserController.create)
 router.post('/login', UserController.login)
-router.patch('/edit/:id', checkAuth, checkRole('analyst'), UserController.editUser)
+router.patch('/update-password', checkAuth, UserController.updatePassword)
+router.patch('/:id', checkAuth, checkRole('analyst'), UserController.update)
+router.delete('/:id', checkAuth, checkRole('analyst'), UserController.delete)
 
 module.exports = router

@@ -6,11 +6,11 @@ const checkAuth = require('../helpers/check-auth')
 const checkRole = require('../helpers/check-role')
 
 router.post('/', checkAuth, checkRole('analyst'), ActivityController.create)
-router.get('/', ActivityController.getAll)
-router.get('/:id', ActivityController.getById)
-router.put('/:id', checkAuth, checkRole('analyst'), ActivityController.update)
+router.get('/:id', checkAuth, checkRole('analyst'), ActivityController.getById)
+router.get('/', checkAuth, checkRole('analyst'), ActivityController.getAll)
+router.get('/name/:name', checkAuth, checkRole('analyst'), ActivityController.getByName)
+router.get('/required-training/:activityId', ActivityController.listRequiredTrainingByActivity)
+router.patch('/:id', checkAuth, checkRole('analyst'), ActivityController.update)
 router.delete('/:id', checkAuth, checkRole('analyst'), ActivityController.delete)
-router.get('/name/:name', ActivityController.getActivityByName)
-router.get('/required-trainings/:activityId', ActivityController.listRequiredTrainingsByActivity)
 
 module.exports = router
