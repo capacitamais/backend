@@ -1,6 +1,6 @@
 const Task = require("../models/Task");
 const ActivityRequiredTraining = require("../models/ActivityRequiredTraining");
-const TrainingReceived = require("../models/TrainingReceived");
+const TrainingReceived = require("../models/ReceivedTraining");
 const User = require("../models/User");
 
 module.exports = class TaskController {
@@ -21,11 +21,9 @@ module.exports = class TaskController {
       // Verifica se o técnico já está atribuído a uma tarefa ativa
       const activeTask = await Task.findOne({ technician, status: true });
       if (activeTask) {
-        return res
-          .status(400)
-          .json({
-            error: `Este técnico já está atribuído a uma tarefa ativa: ${activeTask.name}`,
-          });
+        return res.status(400).json({
+          error: `Este técnico já está atribuído a uma tarefa ativa: ${activeTask.name}`,
+        });
       }
 
       // Obtem os requisitos de treinamento para cada activity
@@ -154,6 +152,31 @@ module.exports = class TaskController {
       res.status(200).json(updatedTask);
     } catch (err) {
       res.status(500).json({ error: "Erro ao atualizar tarefa." });
+    }
+  }
+
+  static async deactivate(req, res) {
+    try {
+      const { id } = req.params;
+
+      const task = await Task.findById(id);
+
+      if (!task) {
+        return res.status(404).json({ error: "Tarefa não encontrada." });
+      }
+
+      if (task.status === false) {
+        return res.status(400).json({ error: "A tarefa já está desativada." });
+      }
+
+      task.status = false;
+      await task.save();
+
+      res.status(200).json({ message: "Tarefa desativada com sucesso.", task });
+    } catch (err) {
+      res
+        .status(500)
+        .json({ error: "Erro ao desativar tarefa.", details: err.message });
     }
   }
 

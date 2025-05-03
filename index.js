@@ -30,7 +30,7 @@ const ActivityRoutes = require("./routes/ActivityRoutes");
 app.use("/activities", ActivityRoutes);
 
 const ActivityRequiredTrainingRoutes = require("./routes/ActivityRequiredTrainingRoutes");
-app.use("/activity-required-trainings", ActivityRequiredTrainingRoutes);
+app.use("/activity-required-training", ActivityRequiredTrainingRoutes);
 
 const HealthExaminationRoutes = require("./routes/HealthExaminationRoutes");
 app.use("/health-examinations", HealthExaminationRoutes);
@@ -38,8 +38,8 @@ app.use("/health-examinations", HealthExaminationRoutes);
 const TaskRoutes = require("./routes/TaskRoutes");
 app.use("/tasks", TaskRoutes);
 
-const TrainingReceivedRoutes = require("./routes/TrainingReceivedRoutes");
-app.use("/training-received", TrainingReceivedRoutes);
+const ReceivedTrainingRoutes = require("./routes/ReceivedTrainingRoutes");
+app.use("/received-training", ReceivedTrainingRoutes);
 
 const TrainingRoutes = require("./routes/TrainingRoutes");
 app.use("/trainings", TrainingRoutes);

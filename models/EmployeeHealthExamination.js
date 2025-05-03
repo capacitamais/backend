@@ -23,6 +23,10 @@ const EmployeeHealthExamination = mongoose.model(
         type: Date,
         required: true,
       },
+      isActive: {
+        type: Boolean,
+        required: true,
+      }
     },
     { timestamps: true }
   )

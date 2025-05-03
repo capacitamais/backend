@@ -1,4 +1,4 @@
-const TrainingReceived = require('../models/TrainingReceived')
+const TrainingReceived = require('../models/ReceivedTraining')
 
 module.exports = class TrainingReceivedController {
   static async register(req, res) {

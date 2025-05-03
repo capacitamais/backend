@@ -20,8 +20,7 @@ const TrainingReceived = mongoose.model(
         required: true,
       },
       dueDate: {
-        type: String, // "N/A" se não tiver vencimento
-        required: true,
+        type: Date,
       },
     },
     { timestamps: true }

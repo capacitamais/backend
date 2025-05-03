@@ -1,14 +1,14 @@
-const router = require('express').Router()
-const TrainingController = require('../controllers/TrainingController')
+const router = require('express').Router();
+const TrainingController = require('../controllers/TrainingController');
 
-//middlewres
-const checkAuth = require('../helpers/check-auth')
-const checkRole = require('../helpers/check-role')
+// middlewares
+const checkAuth = require('../helpers/check-auth');
+const checkRole = require('../helpers/check-role');
 
-router.post('/', checkAuth, checkRole('analyst'), TrainingController.create)
-router.get('/', TrainingController.getAll)
-router.get('/:id', TrainingController.getById)
-router.put('/:id', checkAuth, checkRole('analyst'), TrainingController.update)
-router.delete('/:id', checkAuth, checkRole('analyst'), TrainingController.remove)
+router.post('/', checkAuth, checkRole('analyst'), TrainingController.create);
+router.get('/:id', checkAuth, checkRole('analyst'), TrainingController.getById);
+router.get('/', checkAuth, checkRole('analyst'), TrainingController.getAll);
+router.patch('/:id', checkAuth, checkRole('analyst'), TrainingController.update);
+router.patch('/deactivate/:id', checkAuth, checkRole('analyst'), TrainingController.deactivate);
 
-module.exports = router
+module.exports = router;

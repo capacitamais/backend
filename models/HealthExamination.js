@@ -5,11 +5,11 @@ const HealthExamination = mongoose.model(
   "HealthExamination",
   new Schema(
     {
-      tittle: {
+      title: {
         type: String,
-      required: true,
-    },
-    description: String,
+        required: true,
+      },
+      description: String,
     },
     { timestamps: true }
   )

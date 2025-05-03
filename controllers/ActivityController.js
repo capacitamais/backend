@@ -40,6 +40,33 @@ module.exports = class ActivityController {
     }
   }
 
+  static async getByName(req, res) {
+    try {
+      const { name } = req.params;
+      const activity = await Activity.findOne({ name });
+      res.status(200).json(activity);
+    } catch (err) {
+      res
+        .status(500)
+        .json({ error: "Erro ao buscar atividade", details: err.message });
+    }
+  }
+
+  static async listRequiredTrainingByActivity(req, res) {
+    try {
+      const { activityId } = req.params;
+      const records = await ActivityRequiredTraining.find({
+        activity: activityId,
+      }).populate("training");
+
+      res.status(200).json(records);
+    } catch (err) {
+      res
+        .status(500)
+        .json({ error: "Erro ao buscar treinamentos", details: err.message });
+    }
+  }
+
   static async update(req, res) {
     try {
       const { id } = req.params;
@@ -70,33 +97,6 @@ module.exports = class ActivityController {
       res
         .status(500)
         .json({ error: "Erro ao remover atividade", details: err.message });
-    }
-  }
-
-  static async getActivityByName(req, res) {
-    try {
-      const { name } = req.params;
-      const activity = await Activity.findOne({ name });
-      res.status(200).json(activity);
-    } catch (err) {
-      res
-        .status(500)
-        .json({ error: "Erro ao buscar atividade", details: err.message });
-    }
-  }
-
-  static async listRequiredTrainingsByActivity(req, res) {
-    try {
-      const { activityId } = req.params;
-      const records = await ActivityRequiredTraining.find({
-        activity: activityId,
-      }).populate("training");
-
-      res.status(200).json(records);
-    } catch (err) {
-      res
-        .status(500)
-        .json({ error: "Erro ao buscar treinamentos", details: err.message });
     }
   }
 };
