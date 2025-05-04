@@ -42,3 +42,12 @@ app.use('/trainings', TrainingRoutes)
 
 
 app.listen(5000)
+
+const connectToDatabase = require('./db/conn');
+
+// Impede a conexão durante os testes
+if (process.env.NODE_ENV !== 'test') {
+  connectToDatabase();
+} else {
+  console.log('Ambiente de teste detectado: conexão com o banco de dados foi pulada.');
+}
