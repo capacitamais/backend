@@ -1,4 +1,7 @@
 const Training = require("../models/Training");
+const fs = require("fs");
+const csv = require("csv-parser");
+const path = require("path");
 
 module.exports = class TrainingController {
   static async create(req, res) {
@@ -117,6 +120,55 @@ module.exports = class TrainingController {
       res
         .status(500)
         .json({ error: "Erro ao inativar treinamento", details: err.message });
+    }
+  }
+  static async importFromCSV(req, res) {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "Arquivo CSV não enviado." });
+      }
+  
+      const results = [];
+      const filePath = path.resolve(__dirname, "..", "uploads", req.file.filename);
+
+      fs.createReadStream(filePath)
+        .pipe(csv())
+        .on("data", (row) => {
+          results.push(row);
+        })
+        .on("end", async () => {
+          const createdTrainings = [];
+  
+          for (const row of results) {
+            const { trainingTag, title, description } = row;
+  
+            if (!trainingTag || !title || !description) continue;
+  
+            const lastTraining = await Training.findOne({ trainingTag, isActive: true }).sort({ revision: -1 });
+  
+            let revision = 0;
+            if (lastTraining) {
+              lastTraining.isActive = false;
+              await lastTraining.save();
+              revision = lastTraining.revision + 1;
+            }
+  
+            const newTraining = await Training.create({
+              trainingTag,
+              title,
+              description,
+              revision,
+              isActive: true
+            });
+  
+            createdTrainings.push(newTraining);
+          }
+  
+          fs.unlinkSync(filePath); // apaga o arquivo após uso
+          res.status(201).json({ message: "Importação concluída", trainings: createdTrainings });
+        });
+    } catch (err) {
+      res.status(500).json({ error: "Erro ao importar CSV", details: err.message });
     }
   }
 };
