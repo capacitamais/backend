@@ -69,7 +69,19 @@ module.exports = class TrainingController {
 
   static async getAll(req, res) {
     try {
-      const trainings = await Training.find({ isActive: true }).select("-__v");
+      const { titleOrTag } = req.query;
+
+      let filter = { isActive: true };
+
+      if (titleOrTag) {
+        // Usamos uma expressão regular para permitir busca case-insensitive (i)
+        filter.$or = [
+          { trainingTag: { $regex: new RegExp(titleOrTag, "i") } },
+          { title: { $regex: new RegExp(titleOrTag, "i") } },
+        ];
+      }
+
+      const trainings = await Training.find(filter).select("-__v");
       res.status(200).json(trainings);
     } catch (err) {
       res
