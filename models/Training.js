@@ -8,7 +8,6 @@ const Training = mongoose.model(
       trainingTag: {
         type: String,
         required: true,
-        unique: true,
       },
       revision:{
         type: Number,
