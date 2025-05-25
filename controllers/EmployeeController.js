@@ -16,7 +16,18 @@ module.exports = class EmployeeController {
 
   static async getAll(req, res) {
     try {
-      const employees = await Employee.find();
+      const { nameOrRegistration } = req.query;
+
+      let filter = {};
+
+      if (nameOrRegistration) {
+        filter.$or = [
+          { name: { $regex: new RegExp(nameOrRegistration, "i") } },
+          { registration: { $regex: new RegExp(nameOrRegistration, "i") } },
+        ];
+      }
+
+      const employees = await Employee.find(filter).select("-__v");
       res.status(200).json(employees);
     } catch (err) {
       res
