@@ -76,7 +76,15 @@ module.exports = class TaskController {
   // Get all tasks
   static async getAll(req, res) {
     try {
-      const tasks = await Task.find()
+      const { name } = req.query;
+      
+      let filter = {};
+
+      if(name) {
+        filter.name = { $regex: new RegExp(name, "i") }
+      };
+
+      const tasks = await Task.find(filter)
         .populate("technician", "name registration")
         .populate("activities", "name")
         .populate("employees", "name registration");

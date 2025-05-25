@@ -18,7 +18,15 @@ module.exports = class HealthExaminationController {
 
   static async getAll(req, res) {
     try {
-      const exams = await HealthExamination.find();
+      const { title } = req.query;
+
+      let filter = {};
+
+      if (title) {
+        filter.title = { $regex: new RegExp(title, "i") };
+      }
+
+      const exams = await HealthExamination.find(filter).select("-__v");
 
       res.status(200).json(exams);
     } catch (err) {
