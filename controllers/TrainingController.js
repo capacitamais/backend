@@ -171,4 +171,12 @@ module.exports = class TrainingController {
       res.status(500).json({ error: "Erro ao importar CSV", details: err.message });
     }
   }
+  static async report(req, res) {
+  try {
+    const trainings = await Training.find().select("-__v");
+    res.status(200).json({ reportType: "trainings", total: trainings.length, trainings });
+  } catch (err) {
+    res.status(500).json({ error: "Erro ao gerar relatório de treinamentos", details: err.message });
+  }
+}
 };

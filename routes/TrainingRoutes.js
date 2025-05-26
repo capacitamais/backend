@@ -11,5 +11,10 @@ router.get('/', checkAuth, checkRole('analyst'), TrainingController.getAll);
 router.patch('/:id', checkAuth, checkRole('analyst'), TrainingController.update);
 router.patch('/deactivate/:id', checkAuth, checkRole('analyst'), TrainingController.deactivate);
 router.post('/import', checkAuth, checkRole('analyst'), upload.single('file'), TrainingController.importFromCSV);
-
+router.get(
+  '/report',
+  checkAuth,
+  checkRole('technician'),
+  TrainingController.report
+);
 module.exports = router;
