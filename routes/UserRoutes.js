@@ -10,8 +10,8 @@ router.get('/:id', checkAuth, checkRole('analyst'), UserController.getById)
 router.get('/', checkAuth, checkRole('analyst'), UserController.getAll)
 router.post('/login', UserController.login)
 router.post('/', checkAuth, checkRole('analyst'), UserController.create)
-router.patch('/update-password', checkAuth, UserController.updatePassword)
-router.patch('/:id', checkAuth, checkRole('analyst'), UserController.update)
+router.put('/update-password', checkAuth, UserController.updatePassword)
+router.put('/:id', checkAuth, checkRole('analyst'), UserController.update)
 router.delete('/:id', checkAuth, checkRole('analyst'), UserController.delete)
 
 module.exports = router
