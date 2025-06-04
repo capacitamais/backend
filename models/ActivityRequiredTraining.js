@@ -15,6 +15,10 @@ const ActivityRequiredTraining = mongoose.model(
         ref: "Training",
         required: true,
       },
+      isActive: {
+        type: Boolean,
+        default: true,
+      },
     },
     { timestamps: true }
   )

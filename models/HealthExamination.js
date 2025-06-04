@@ -10,6 +10,10 @@ const HealthExamination = mongoose.model(
         required: true,
       },
       description: String,
+      isActive: {
+        type: Boolean,
+        default: true,
+      },
     },
     { timestamps: true }
   )

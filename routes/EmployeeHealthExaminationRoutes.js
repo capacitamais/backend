@@ -1,10 +1,29 @@
-const router = require('express').Router()
-const EmployeeHealthExaminationController = require('../controllers/EmployeeHealthExaminationController')
+const router = require("express").Router();
+const EmployeeHealthExaminationController = require("../controllers/EmployeeHealthExaminationController");
 
 //middlewres
-const checkAuth = require('../helpers/check-auth')
-const checkRole = require('../helpers/check-role')
+const checkAuth = require("../helpers/check-auth");
+const checkRole = require("../helpers/check-role");
 
-router.post('/', checkAuth, checkRole('analyst'), EmployeeHealthExaminationController.register)
+router.post(
+  "/",
+  checkAuth,
+  checkRole("analyst"),
+  EmployeeHealthExaminationController.register
+);
 
-module.exports = router
+router.get(
+  "/employee/:id",
+  checkAuth,
+  checkRole("analyst"),
+  EmployeeHealthExaminationController.getAllByEmployeeId
+);
+
+router.patch(
+  "/deactivate/:examinationId",
+  checkAuth,
+  checkRole("analyst"),
+  EmployeeHealthExaminationController.deactivate
+);
+
+module.exports = router;

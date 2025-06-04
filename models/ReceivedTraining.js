@@ -22,6 +22,10 @@ const TrainingReceived = mongoose.model(
       dueDate: {
         type: Date,
       },
+      isActive: {
+        type: Boolean,
+        default: true,
+      },
     },
     { timestamps: true }
   )
