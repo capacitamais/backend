@@ -8,13 +8,14 @@ module.exports = class ActivityRequiredTrainingController {
       const record = await ActivityRequiredTraining.create({
         activity: activityId,
         training: trainingId,
-      });
+      }).select("-__v");
 
-      res.status(201).json(record).select("-__v");
+      res.status(201).json(record);
     } catch (err) {
-      res
-        .status(500)
-        .json({ error: "Erro ao vincular treinamento e atividade.", details: err.message });
+      res.status(500).json({
+        error: "Erro ao vincular treinamento e atividade.",
+        details: err.message,
+      });
     }
   }
 
@@ -25,15 +26,15 @@ module.exports = class ActivityRequiredTrainingController {
       const activityTraining = await ActivityRequiredTraining.find({
         activity: id,
         isActive: true,
-      }
-      )
-        .pupulate()
+      })
+        .populate("training", "trainingTag title revision")
         .select("-__v");
-      
+
+      res.status(200).json(activityTraining);
     } catch (err) {
       res.status(500).json({
         error: "Erro ao buscar treinamentos da atividade.",
-        details:err.message,
+        details: err.message,
       });
     }
   }
@@ -56,12 +57,14 @@ module.exports = class ActivityRequiredTrainingController {
       record.isActive = false;
       await record.save();
 
-      res.status(200).json({ message: "Treinamento desvinculado com sucesso." });
+      res
+        .status(200)
+        .json({ message: "Treinamento desvinculado com sucesso." });
     } catch (err) {
       res.status(500).json({
         error: "Erro ao desvincular treinamento.",
         details: err.message,
-      })
+      });
     }
   }
 };

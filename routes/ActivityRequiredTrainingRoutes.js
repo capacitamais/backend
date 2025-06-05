@@ -13,7 +13,7 @@ router.post(
 );
 
 router.get(
-  "",
+  "/activity/:id",
   checkAuth,
   checkRole("analyst"),
   ActivityRequiredTrainingController.getAllByActivityId

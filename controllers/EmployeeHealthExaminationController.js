@@ -10,7 +10,7 @@ module.exports = class EmployeeHealthExaminationController {
         healthExamination: healthExaminationId,
         date,
         dueDate,
-      });
+      }).select("-__v");
 
       res.status(201).json(record);
     } catch (err) {
