@@ -26,4 +26,11 @@ router.patch(
   EmployeeHealthExaminationController.deactivate
 );
 
+router.delete(
+  "/:id",
+  checkAuth,
+  checkRole("analyst"),
+  EmployeeHealthExaminationController.delete
+);
+
 module.exports = router;

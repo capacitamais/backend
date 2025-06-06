@@ -26,4 +26,11 @@ router.patch(
   TrainingReceivedController.deactivate
 );
 
+router.delete(
+  "/:id",
+  checkAuth,
+  checkRole("analyst"),
+  TrainingReceivedController.delete
+);
+
 module.exports = router;

@@ -5,10 +5,21 @@ module.exports = class ActivityRequiredTrainingController {
     try {
       const { activityId, trainingId } = req.body;
 
+      const saved = await ActivityRequiredTraining.findOne({
+        activity: activityId,
+        training: trainingId,
+      });
+
+      if(saved) {
+        return res
+          .status(409)
+          .json({ message: "Treinamento já aplicado à tarefa."});
+      }
+
       const record = await ActivityRequiredTraining.create({
         activity: activityId,
         training: trainingId,
-      }).select("-__v");
+      });
 
       res.status(201).json(record);
     } catch (err) {
@@ -63,6 +74,25 @@ module.exports = class ActivityRequiredTrainingController {
     } catch (err) {
       res.status(500).json({
         error: "Erro ao desvincular treinamento.",
+        details: err.message,
+      });
+    }
+  }
+
+  static async delete(req, res) {
+    try {
+      const { id } = req.params;
+
+      const deleted = await ActivityRequiredTraining.findByIdAndDelete(id);
+
+      if (!deleted) {
+        return res.status(404).json({ message: "Registro não encontrado." });
+      }
+
+      res.status(200).json({ message: "Registro deletado com sucesso." });
+    } catch (err) {
+      res.status(500).json({
+        error: "Erro ao deletar o registro.",
         details: err.message,
       });
     }
