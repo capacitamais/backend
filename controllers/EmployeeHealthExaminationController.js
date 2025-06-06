@@ -5,12 +5,23 @@ module.exports = class EmployeeHealthExaminationController {
     try {
       const { employeeId, healthExaminationId, date, dueDate } = req.body;
 
+      const saved = await EmployeeHealthExamination.findOne({
+        employee: employeeId,
+        healthExamination: healthExaminationId,
+      });
+
+      if (saved) {
+        return res
+          .status(409)
+          .json({ message: "Exame já aplicado ao colaborador." });
+      }
+
       const record = await EmployeeHealthExamination.create({
         employee: employeeId,
         healthExamination: healthExaminationId,
         date,
         dueDate,
-      }).select("-__v");
+      });
 
       res.status(201).json(record);
     } catch (err) {
@@ -63,6 +74,25 @@ module.exports = class EmployeeHealthExaminationController {
     } catch (err) {
       res.status(500).json({
         error: "Erro ao desvincular exame.",
+        details: err.message,
+      });
+    }
+  }
+
+  static async delete(req, res) {
+    try {
+      const { id } = req.params;
+
+      const deleted = await EmployeeHealthExamination.findByIdAndDelete(id);
+
+      if (!deleted) {
+        return res.status(404).json({ message: "Registro não encontrado." });
+      }
+
+      res.status(200).json({ message: "Registro deletado com sucesso." });
+    } catch (err) {
+      res.status(500).json({
+        error: "Erro ao deletar o registro.",
         details: err.message,
       });
     }
