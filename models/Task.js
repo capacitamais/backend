@@ -19,7 +19,7 @@ const Task = mongoose.model(
         ref: "User",
         required: true,
       },
-      status: {
+      isActive: {
         type: Boolean,
         default: true,
       },

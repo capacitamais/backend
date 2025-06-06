@@ -1,10 +1,29 @@
-const router = require('express').Router()
-const TrainingReceivedController = require('../controllers/TrainingReceivedController')
+const router = require("express").Router();
+const TrainingReceivedController = require("../controllers/TrainingReceivedController");
 
 //middlewres
-const checkAuth = require('../helpers/check-auth')
-const checkRole = require('../helpers/check-role')
+const checkAuth = require("../helpers/check-auth");
+const checkRole = require("../helpers/check-role");
 
-router.post('/', checkAuth, checkRole('analyst'), TrainingReceivedController.register)
+router.post(
+  "/",
+  checkAuth,
+  checkRole("analyst"),
+  TrainingReceivedController.register
+);
 
-module.exports = router
+router.get(
+  "/employee/:id",
+  checkAuth,
+  checkRole("analyst"),
+  TrainingReceivedController.getAllByEmployeeId
+);
+
+router.patch(
+  "/deactivate/:trainingId",
+  checkAuth,
+  checkRole("analyst"),
+  TrainingReceivedController.deactivate
+);
+
+module.exports = router;
