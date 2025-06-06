@@ -44,4 +44,7 @@ app.use("/received-training", ReceivedTrainingRoutes);
 const TrainingRoutes = require("./routes/TrainingRoutes");
 app.use("/trainings", TrainingRoutes);
 
+const TechnicianReportRoutes = require("./routes/TechnicianReportRoutes");
+app.use("/report", TechnicianReportRoutes);
+
 app.listen(5000);
