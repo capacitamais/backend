@@ -1,5 +1,6 @@
 const router = require("express").Router();
-const TrainingReceivedController = require("../controllers/TrainingReceivedController");
+const upload = require("../helpers/upload");
+const ReceivedTrainingController = require("../controllers/ReceivedTrainingController");
 
 //middlewres
 const checkAuth = require("../helpers/check-auth");
@@ -9,28 +10,36 @@ router.post(
   "/",
   checkAuth,
   checkRole("analyst"),
-  TrainingReceivedController.register
+  ReceivedTrainingController.register
 );
 
 router.get(
   "/employee/:id",
   checkAuth,
   checkRole("analyst"),
-  TrainingReceivedController.getAllByEmployeeId
+  ReceivedTrainingController.getAllByEmployeeId
 );
 
 router.patch(
   "/deactivate/:trainingId",
   checkAuth,
   checkRole("analyst"),
-  TrainingReceivedController.deactivate
+  ReceivedTrainingController.deactivate
 );
 
 router.delete(
   "/:id",
   checkAuth,
   checkRole("analyst"),
-  TrainingReceivedController.delete
+  ReceivedTrainingController.delete
+);
+
+router.post(
+  "/import",
+  checkAuth,
+  checkRole("analyst"),
+  upload.single("file"),
+  ReceivedTrainingController.import
 );
 
 module.exports = router;
