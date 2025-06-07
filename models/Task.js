@@ -10,6 +10,7 @@ const Task = mongoose.model(
         required: true,
       },
       description: String,
+      site: String,
       dueDate: {
         type: Date,
         required: true,
