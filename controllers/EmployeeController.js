@@ -4,8 +4,8 @@ const TrainingReceived = require("../models/ReceivedTraining");
 module.exports = class EmployeeController {
   static async create(req, res) {
     try {
-      const { name, registration } = req.body;
-      const employee = await Employee.create({ name, registration });
+      const { name, registration, isActive } = req.body;
+      const employee = await Employee.create({ name, registration, isActive });
       res.status(201).json(employee);
     } catch (err) {
       res
@@ -53,10 +53,10 @@ module.exports = class EmployeeController {
   static async update(req, res) {
     try {
       const { id } = req.params;
-      const { name, registration } = req.body;
+      const { name, registration, isActive } = req.body;
       const updated = await Employee.findByIdAndUpdate(
         id,
-        { name, registration },
+        { name, registration, isActive },
         { new: true }
       );
       if (!updated)
