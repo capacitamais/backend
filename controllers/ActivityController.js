@@ -77,10 +77,10 @@ module.exports = class ActivityController {
   static async update(req, res) {
     try {
       const { id } = req.params;
-      const { name, description } = req.body;
+      const { name, description, isActive } = req.body;
       const updated = await Activity.findByIdAndUpdate(
         id,
-        { name, description },
+        { name, description, isActive },
         { new: true }
       );
       if (!updated)

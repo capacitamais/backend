@@ -106,11 +106,11 @@ module.exports = class TrainingController {
   static async update(req, res) {
     try {
       const { id } = req.params;
-      const { title, description } = req.body;
+      const { title, description, isActive } = req.body;
 
       const updated = await Training.findByIdAndUpdate(
         id,
-        { title, description },
+        { title, description, isActive },
         { new: true }
       ).select("-__v");
 
@@ -126,7 +126,6 @@ module.exports = class TrainingController {
     }
   }
 
-  // Inativar treinamento (não excluir)
   static async deactivate(req, res) {
     try {
       const { id } = req.params;
