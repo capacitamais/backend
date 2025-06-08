@@ -126,7 +126,7 @@ module.exports = class TrainingController {
     }
   }
 
-  static async delete(req, res) {
+  static async deactivate(req, res) {
     try {
       const { id } = req.params;
       const training = await Training.findById(id);
