@@ -56,11 +56,11 @@ module.exports = class HealthExaminationController {
     try {
       const { id } = req.params;
 
-      const { title, description } = req.body;
+      const { title, description, isActive } = req.body;
 
       const updated = await HealthExamination.findByIdAndUpdate(
         id,
-        { title, description },
+        { title, description, isActive },
         { new: true }
       );
 
