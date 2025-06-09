@@ -8,9 +8,8 @@ const Training = mongoose.model(
       trainingTag: {
         type: String,
         required: true,
-        unique: true,
       },
-      revision:{
+      revision: {
         type: Number,
         required: true,
       },
@@ -22,7 +21,7 @@ const Training = mongoose.model(
       isActive: {
         type: Boolean,
         default: true,
-      }
+      },
     },
     { timestamps: true }
   )

@@ -17,7 +17,14 @@ module.exports = class ActivityController {
 
   static async getAll(req, res) {
     try {
-      const activities = await Activity.find();
+      const { name } = req.query;
+
+      let filter = {};
+
+      if (name) {
+        filter.name = { $regex: new RegExp(name, "i") };
+      }
+      const activities = await Activity.find(filter).select("-__v");
       res.status(200).json(activities);
     } catch (err) {
       res
@@ -70,10 +77,10 @@ module.exports = class ActivityController {
   static async update(req, res) {
     try {
       const { id } = req.params;
-      const { name, description } = req.body;
+      const { name, description, isActive } = req.body;
       const updated = await Activity.findByIdAndUpdate(
         id,
-        { name, description },
+        { name, description, isActive },
         { new: true }
       );
       if (!updated)

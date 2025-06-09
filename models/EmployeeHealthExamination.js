@@ -21,12 +21,12 @@ const EmployeeHealthExamination = mongoose.model(
       },
       dueDate: {
         type: Date,
-        required: true,
+        required: false,
       },
       isActive: {
         type: Boolean,
-        required: true,
-      }
+        default: true,
+      },
     },
     { timestamps: true }
   )

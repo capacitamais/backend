@@ -1,13 +1,14 @@
 const Task = require("../models/Task");
 const ActivityRequiredTraining = require("../models/ActivityRequiredTraining");
 const TrainingReceived = require("../models/ReceivedTraining");
+const Employee = require("../models/Employee");
 const User = require("../models/User");
 
 module.exports = class TaskController {
   // Create Task
   static async create(req, res) {
     try {
-      const { name, description, dueDate, technician, activities, employees } =
+      const { name, description, site, dueDate, technician, activities, employees } =
         req.body;
 
       // Verifica se o técnico existe e é da role "technician"
@@ -48,8 +49,9 @@ module.exports = class TaskController {
         );
 
         if (missingTrainings.length > 0) {
+          const employee = await Employee.findById(employeeId);
           return res.status(400).json({
-            error: `Funcionário ${employeeId} não possui todos os treinamentos exigidos para a tarefa.`,
+            error: `Funcionário ${employee.registration} ${employee.name} não possui todos os treinamentos exigidos para a tarefa.`,
             missingTrainings,
           });
         }
@@ -59,11 +61,12 @@ module.exports = class TaskController {
       const task = await Task.create({
         name,
         description,
+        site,
         dueDate,
         technician,
         activities,
         employees,
-        status: true, // por padrão a tarefa criada é ativa
+        status: true,
       });
 
       res.status(201).json(task);
@@ -76,7 +79,15 @@ module.exports = class TaskController {
   // Get all tasks
   static async getAll(req, res) {
     try {
-      const tasks = await Task.find()
+      const { name } = req.query;
+      
+      let filter = {};
+
+      if(name) {
+        filter.name = { $regex: new RegExp(name, "i") }
+      };
+
+      const tasks = await Task.find(filter)
         .populate("technician", "name registration")
         .populate("activities", "name")
         .populate("employees", "name registration");
@@ -91,9 +102,9 @@ module.exports = class TaskController {
     try {
       const { id } = req.params;
       const task = await Task.findById(id)
-        .populate("technician", "name registration")
-        .populate("activities", "name")
-        .populate("employees", "name registration");
+        .populate("technician", "_id name registration")
+        .populate("activities", "_id name")
+        .populate("employees", "_id name registration");
 
       if (!task)
         return res.status(404).json({ error: "Tarefa não encontrada." });
@@ -109,7 +120,7 @@ module.exports = class TaskController {
     try {
       const { technicianId } = req.params;
 
-      const tasks = await Task.find({ technician: technicianId, status: true })
+      const tasks = await Task.find({ technician: technicianId, isActive: true })
         .populate("technician", "name registration")
         .populate("activities", "name")
         .populate("employees", "name registration");
@@ -165,11 +176,11 @@ module.exports = class TaskController {
         return res.status(404).json({ error: "Tarefa não encontrada." });
       }
 
-      if (task.status === false) {
+      if (task.isActive === false) {
         return res.status(400).json({ error: "A tarefa já está desativada." });
       }
 
-      task.status = false;
+      task.isActive = false;
       await task.save();
 
       res.status(200).json({ message: "Tarefa desativada com sucesso.", task });

@@ -33,12 +33,27 @@ module.exports = class UserController {
       return;
     }
 
-    res.status(200).json({ user });
+    res.status(200).json( user );
   }
 
   static async getAll(req, res) {
     try {
-      const users = await User.find({}, "-password -__v"); // Exclui a senha dos resultados
+      const { nameOrRegistration, role } = req.query;
+
+      let filter = {};
+
+      if (nameOrRegistration) {
+        filter.$or = [
+          { name: { $regex: new RegExp(nameOrRegistration, "i") } },
+          { registration: { $regex: new RegExp(nameOrRegistration, "i") } },
+        ];
+      }
+
+      if (role !== undefined && isNaN(role)){
+        filter.role = role;
+      }
+
+      const users = await User.find(filter).select("-password -__v"); // Exclui a senha dos resultados
       res.status(200).json(users);
     } catch (error) {
       console.error("Erro ao buscar usuários:", error);

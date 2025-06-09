@@ -20,7 +20,15 @@ module.exports = class HealthExaminationController {
 
   static async getAll(req, res) {
     try {
-      const exams = await HealthExamination.find();
+      const { title } = req.query;
+
+      let filter = {};
+
+      if (title) {
+        filter.title = { $regex: new RegExp(title, "i") };
+      }
+
+      const exams = await HealthExamination.find(filter).select("-__v");
 
       res.status(200).json(exams);
     } catch (err) {
@@ -50,11 +58,11 @@ module.exports = class HealthExaminationController {
     try {
       const { id } = req.params;
 
-      const { title, description } = req.body;
+      const { title, description, isActive } = req.body;
 
       const updated = await HealthExamination.findByIdAndUpdate(
         id,
-        { title, description },
+        { title, description, isActive },
         { new: true }
       );
 

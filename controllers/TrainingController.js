@@ -72,23 +72,48 @@ module.exports = class TrainingController {
 
   static async getAll(req, res) {
     try {
-      const trainings = await Training.find({ isActive: true }).select("-__v");
+      const { titleOrTag, isActive, revision } = req.query;
+
+      let filter = {};
+
+      // Filtro por trainingTag ou title
+      if (titleOrTag) {
+        filter.$or = [
+          { trainingTag: { $regex: new RegExp(titleOrTag, "i") } },
+          { title: { $regex: new RegExp(titleOrTag, "i") } },
+        ];
+      }
+
+      // Filtro por isActive (convertendo string para boolean)
+      if (isActive === "true") {
+        filter.isActive = true;
+      } else if (isActive === "false") {
+        filter.isActive = false;
+      }
+
+      // Filtro por revision (convertendo para número se válido)
+      if (revision !== undefined && !isNaN(revision)) {
+        filter.revision = Number(revision);
+      }
+
+      const trainings = await Training.find(filter).select("-__v");
       res.status(200).json(trainings);
     } catch (err) {
-      res
-        .status(500)
-        .json({ error: "Erro ao listar treinamentos", details: err.message });
+      res.status(500).json({
+        error: "Erro ao listar treinamentos",
+        details: err.message,
+      });
     }
   }
 
   static async update(req, res) {
     try {
       const { id } = req.params;
-      const { title, description } = req.body;
+      const { title, description, isActive } = req.body;
 
       const updated = await Training.findByIdAndUpdate(
         id,
-        { title, description },
+        { title, description, isActive },
         { new: true }
       ).select("-__v");
 
@@ -104,7 +129,6 @@ module.exports = class TrainingController {
     }
   }
 
-  // Inativar treinamento (não excluir)
   static async deactivate(req, res) {
     try {
       const { id } = req.params;
