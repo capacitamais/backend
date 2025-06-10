@@ -33,7 +33,7 @@ module.exports = class UserController {
       return;
     }
 
-    res.status(200).json( user );
+    res.status(200).json(user);
   }
 
   static async getAll(req, res) {
@@ -49,7 +49,7 @@ module.exports = class UserController {
         ];
       }
 
-      if (role !== undefined && isNaN(role)){
+      if (role !== undefined && isNaN(role)) {
         filter.role = role;
       }
 
@@ -169,6 +169,32 @@ module.exports = class UserController {
       user.password = await bcrypt.hash(newPassword, salt);
       await user.save();
 
+      res.status(200).json({ message: "Senha atualizada com sucesso!" });
+    } catch (error) {
+      console.error("Erro ao atualizar senha:", error);
+      res.status(500).json({ message: "Erro interno do servidor." });
+    }
+  }
+
+  static async resetPassword(req, res) {
+    try {
+      const { id } = req.params;
+
+      const user = await User.findById(id);
+      if (!user) {
+        return res
+          .status(404)
+          .json({ message: `Usuário com id ${id} não encontrado.` });
+      }
+
+      // Criando senha padrão (nome + matrícula)
+      const defaultPassword = `${user.name}${user.registration}`;
+
+      const salt = await bcrypt.genSalt(12);
+      user.password = await bcrypt.hash(defaultPassword, salt);
+
+      await user.save();
+      
       res.status(200).json({ message: "Senha atualizada com sucesso!" });
     } catch (error) {
       console.error("Erro ao atualizar senha:", error);

@@ -11,6 +11,7 @@ router.get('/', checkAuth, checkRole('analyst'), UserController.getAll)
 router.post('/login', UserController.login)
 router.post('/', checkAuth, checkRole('analyst'), UserController.create)
 router.put('/update-password', checkAuth, UserController.updatePassword)
+router.put('/reset-password/:id', checkAuth, checkRole('analyst'), UserController.resetPassword)
 router.put('/:id', checkAuth, checkRole('analyst'), UserController.update)
 router.delete('/:id', checkAuth, checkRole('analyst'), UserController.delete)
 

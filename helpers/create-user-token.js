@@ -21,6 +21,7 @@ const createUserToken = async (user, req, res) => {
         {
             id: user._id,
             name: user.name,
+            registration: user.registration,
             role: user.role,
         },
         process.env.TOKEN_KEY,
