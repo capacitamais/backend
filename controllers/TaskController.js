@@ -37,26 +37,6 @@ module.exports = class TaskController {
         String(rt.training)
       );
 
-      // Para cada funcionário, verifica se possui todos os treinamentos exigidos
-      for (const employeeId of employees) {
-        const trainingsDone = await TrainingReceived.find({
-          employee: employeeId,
-        });
-        const trainingsIdsDone = trainingsDone.map((td) => String(td.training));
-
-        const missingTrainings = requiredTrainingIds.filter(
-          (reqId) => !trainingsIdsDone.includes(reqId)
-        );
-
-        if (missingTrainings.length > 0) {
-          const employee = await Employee.findById(employeeId);
-          return res.status(400).json({
-            error: `Funcionário ${employee.registration} ${employee.name} não possui todos os treinamentos exigidos para a tarefa.`,
-            missingTrainings,
-          });
-        }
-      }
-
       // Criação da tarefa
       const task = await Task.create({
         name,
