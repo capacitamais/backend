@@ -4,7 +4,7 @@ const TrainingController = require('../controllers/TrainingController');
 // middlewares
 const checkAuth = require('../helpers/check-auth');
 const checkRole = require('../helpers/check-role');
-
+const upload = require('../helpers/upload');
 router.post('/', checkAuth, checkRole('analyst'), TrainingController.create);
 router.get('/:id', checkAuth, checkRole('analyst'), TrainingController.getById);
 router.get('/', checkAuth, checkRole('analyst'), TrainingController.getAll);

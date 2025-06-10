@@ -4,7 +4,7 @@ const HealthExaminationController = require('../controllers/HealthExaminationCon
 //middlewres
 const checkAuth = require('../helpers/check-auth')
 const checkRole = require('../helpers/check-role')
-
+const upload = require('../helpers/upload');
 router.post('/', checkAuth, checkRole('analyst'), HealthExaminationController.create)
 router.get('/:id', checkAuth, checkRole('analyst'), HealthExaminationController.getById)
 router.get('/', checkAuth, checkRole('analyst'), HealthExaminationController.getAll)
