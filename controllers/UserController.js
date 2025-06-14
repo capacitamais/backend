@@ -38,7 +38,7 @@ module.exports = class UserController {
 
   static async getAll(req, res) {
     try {
-      const { nameOrRegistration, role } = req.query;
+      const { nameOrRegistration, role, isActive } = req.query;
 
       let filter = {};
 
@@ -51,6 +51,10 @@ module.exports = class UserController {
 
       if (role !== undefined && isNaN(role)) {
         filter.role = role;
+      }
+
+      if (isActive !== undefined) {
+        filter.isActive = isActive === "true";
       }
 
       const users = await User.find(filter).select("-password -__v"); // Exclui a senha dos resultados
@@ -194,7 +198,7 @@ module.exports = class UserController {
       user.password = await bcrypt.hash(defaultPassword, salt);
 
       await user.save();
-      
+
       res.status(200).json({ message: "Senha atualizada com sucesso!" });
     } catch (error) {
       console.error("Erro ao atualizar senha:", error);
@@ -210,32 +214,42 @@ module.exports = class UserController {
         return res.status(400).json({ message: "ID inválido." });
       }
 
-      const user = await User.findById(id);
+      const updateData = {};
+
+      const { name, registration, role, isActive } = req.body;
+
+      if (name !== undefined) {
+        updateData.name = name;
+      }
+      if (registration !== undefined) {
+        updateData.registration = registration;
+      }
+      if (role !== undefined) {
+        updateData.role = role;
+      }
+      if (isActive !== undefined) {
+        updateData.isActive = isActive === true || isActive === "true";
+      }
+
+      if (Object.keys(updateData).length === 0) {
+        return res
+          .status(422)
+          .json({ message: "Nenhum dado fornecido para atualização." });
+      }
+
+      const user = await User.findByIdAndUpdate(
+        id,
+        updateData,
+        { new: true }
+      ).select("-password -__v");
+
       if (!user) {
         return res.status(404).json({ message: "Usuário não encontrado." });
       }
 
-      const { name, registration, role } = req.body;
-
-      if (!name || !registration || !role) {
-        return res
-          .status(422)
-          .json({ message: "Todos os campos são obrigatórios." });
-      }
-
-      user.name = name;
-      user.registration = registration;
-      user.role = role;
-
-      await user.save();
-
-      const updatedUser = await User.findById(user._id).select(
-        "-password -__v"
-      );
-
       res.status(200).json({
         message: "Usuário atualizado com sucesso!",
-        user: updatedUser,
+        user: user,
       });
     } catch (error) {
       console.error("Erro ao editar usuário:", error);
