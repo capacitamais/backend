@@ -78,13 +78,16 @@ module.exports = class ActivityController {
     try {
       const { id } = req.params;
       const { name, description, isActive } = req.body;
+      
       const updated = await Activity.findByIdAndUpdate(
         id,
         { name, description, isActive },
         { new: true }
       );
+
       if (!updated)
         return res.status(404).json({ error: "Atividade não encontrada" });
+
       res.status(200).json(updated);
     } catch (err) {
       res
