@@ -52,17 +52,17 @@ JWT_SECRET=<determine uma senha para aumentar a segurança da aplicação>
 ```
 
 ### 3. Instale as Dependências
-Instale as bibliotecas necessárias para o frontend:
+Instale as bibliotecas necessárias para a aplicação:
 
 ```bash
 npm install
 ```
 
 ### 4. Execute o Projeto
-Inicie o servidor de desenvolvimento do frontend:
+Inicie o servidor:
 
 ```bash
-npm run start
+npm start
 ```
 
 
@@ -104,9 +104,9 @@ O layout do Capacita+ é responsivo, adaptando-se a telas entre 320 e 1200+ px, 
 ### Requisitos Funcionais
 - **RF-0001**: Analistas podem cadastrar, visualizar, editar e apagar registros.
 - **RF-0002**: Técnicos podem pesquisar situação de colaboradores por nome ou matrícula.
-- **RF-0003**: Exibir apenas treinamentos relevantes para o técnico.
+- **RF-0003**: Exibir apenas a tarefa com colaboradores relevantes para o técnico.
 - **RF-0004**: Importar dados de planilhas .csv.
-- **RF-0005**: Armazenar relatórios localmente.
+- **RF-0005**: Acessar informações dos colaboradores localmente.
 - **RF-0006**: Autenticação de usuários.
 - **RF-0007**: Recuperação de senha.
 

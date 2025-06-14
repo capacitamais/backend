@@ -57,6 +57,7 @@ module.exports = class TechnicianReportController {
           trainingReceived: trainings.map((t) => ({
             id: t._id,
             trainingTag: t.training.trainingTag,
+            name: t.training.title,
             revision: t.training.revision,
             date: t.date,
             dueDate: t.dueDate || "N/A",
