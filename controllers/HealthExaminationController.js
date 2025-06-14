@@ -1,6 +1,8 @@
 const HealthExamination = require("../models/HealthExamination");
 const EmployeeHealthExamination = require("../models/EmployeeHealthExamination");
-
+const fs = require("fs");
+const csv = require("csv-parser");
+const path = require("path");
 module.exports = class HealthExaminationController {
   static async create(req, res) {
     try {
@@ -99,5 +101,53 @@ module.exports = class HealthExaminationController {
         .status(500)
         .json({ error: "Erro ao remover exame", details: err.message });
     }
+    }
+    static async importFromCSV(req, res) {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "Arquivo CSV não enviado." });
+    }
+
+    const results = [];
+    const filePath = path.resolve(__dirname, "..", "uploads", req.file.filename);
+
+    fs.createReadStream(filePath)
+      .pipe(csv())
+      .on("data", (row) => {
+        results.push(row);
+      })
+      .on("end", async () => {
+        const createdExams = [];
+
+        for (const row of results) {
+          const { title, description } = row;
+
+          if (!title) continue;
+
+          const exam = await HealthExamination.create({
+            title,
+            description
+          });
+
+          createdExams.push(exam);
+        }
+
+        fs.unlinkSync(filePath);
+        res.status(201).json({
+          message: "Importação concluída",
+          exams: createdExams,
+        });
+      });
+  } catch (err) {
+    res.status(500).json({ error: "Erro ao importar CSV", details: err.message });
   }
+}
+static async report(req, res) {
+  try {
+    const exams = await HealthExamination.find().select("-__v");
+    res.status(200).json({ reportType: "healthExaminations", total: exams.length, exams });
+  } catch (err) {
+    res.status(500).json({ error: "Erro ao gerar relatório de exames", details: err.message });
+  }
+}
 };
