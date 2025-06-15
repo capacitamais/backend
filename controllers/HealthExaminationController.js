@@ -18,12 +18,19 @@ module.exports = class HealthExaminationController {
 
   static async getAll(req, res) {
     try {
-      const { title } = req.query;
+      const { title, isActive } = req.query;
 
       let filter = {};
 
       if (title) {
         filter.title = { $regex: new RegExp(title, "i") };
+      }
+
+      // Filtro por isActive (convertendo string para boolean)
+      if (isActive === "true") {
+        filter.isActive = true;
+      } else if (isActive === "false") {
+        filter.isActive = false;
       }
 
       const exams = await HealthExamination.find(filter).select("-__v");

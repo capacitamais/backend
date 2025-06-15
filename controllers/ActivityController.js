@@ -17,13 +17,21 @@ module.exports = class ActivityController {
 
   static async getAll(req, res) {
     try {
-      const { name } = req.query;
+      const { name, isActive } = req.query;
 
       let filter = {};
 
       if (name) {
         filter.name = { $regex: new RegExp(name, "i") };
       }
+
+      // Filtro por isActive (convertendo string para boolean)
+      if (isActive === "true") {
+        filter.isActive = true;
+      } else if (isActive === "false") {
+        filter.isActive = false;
+      }
+
       const activities = await Activity.find(filter).select("-__v");
       res.status(200).json(activities);
     } catch (err) {

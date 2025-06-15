@@ -16,7 +16,7 @@ module.exports = class EmployeeController {
 
   static async getAll(req, res) {
     try {
-      const { nameOrRegistration } = req.query;
+      const { nameOrRegistration, isActive } = req.query;
 
       let filter = {};
 
@@ -25,6 +25,13 @@ module.exports = class EmployeeController {
           { name: { $regex: new RegExp(nameOrRegistration, "i") } },
           { registration: { $regex: new RegExp(nameOrRegistration, "i") } },
         ];
+      }
+
+      // Filtro por isActive (convertendo string para boolean)
+      if (isActive === "true") {
+        filter.isActive = true;
+      } else if (isActive === "false") {
+        filter.isActive = false;
       }
 
       const employees = await Employee.find(filter).select("-__v");
